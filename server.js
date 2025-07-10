@@ -89,6 +89,17 @@ app.post('/api/websites/:id/paths', async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 });
+// Get a single website by ID (used in EditWebsite.jsx)
+app.get('/api/websites/:id', async (req, res) => {
+  try {
+    const website = await Website.findById(req.params.id);
+    if (!website) return res.status(404).json({ message: 'Website not found' });
+
+    res.json(website);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
 
 // Update a specific path by path ID inside a website
 app.put('/api/websites/:websiteId/paths/:pathId', async (req, res) => {
