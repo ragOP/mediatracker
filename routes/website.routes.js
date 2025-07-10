@@ -15,59 +15,23 @@ function verifyToken(req, res, next) {
   });
 }
 
-// CREATE
-router.post('/', verifyToken, async (req, res) => {
-  try {
-    const website = new Website(req.body);
-    website.paths.forEach(p => { p.updatedBy = req.user.email });
-    await website.save();
-    res.status(201).json(website);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
+// EXISTING ROUTES...
+router.post('/', verifyToken, async (req, res) => { /* ... */ });
+router.get('/', async (req, res) => { /* ... */ });
+router.get('/:id', async (req, res) => { /* ... */ });
+router.put('/:id', verifyToken, async (req, res) => { /* ... */ });
+router.delete('/:id', verifyToken, async (req, res) => { /* ... */ });
 
-// GET ALL
-router.get('/', async (req, res) => {
-  try {
-    const websites = await Website.find();
-    res.json(websites);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
 
-// GET ONE
-router.get('/:id', async (req, res) => {
-  try {
-    const website = await Website.findById(req.params.id);
-    res.json(website);
-  } catch (error) {
-    res.status(404).json({ error: "Website not found" });
-  }
-});
+// 🔽 ADD THESE NEW PATH ROUTES BELOW 🔽
 
-// UPDATE
-router.put('/:id', verifyToken, async (req, res) => {
-  try {
-    if (req.body.paths) {
-      req.body.paths.forEach(p => { p.updatedBy = req.user.email });
-    }
-    const updated = await Website.findByIdAndUpdate(req.params.id, req.body, { new: true });
-    res.json(updated);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
+// Add new path
+router.post('/:id/paths', verifyToken, async (req, res) => { /* ... */ });
 
-// DELETE
-router.delete('/:id', verifyToken, async (req, res) => {
-  try {
-    await Website.findByIdAndDelete(req.params.id);
-    res.json({ message: 'Deleted successfully' });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
+// Edit a specific path
+router.put('/:id/paths/:pathId', verifyToken, async (req, res) => { /* ... */ });
+
+// Delete a path
+router.delete('/:id/paths/:pathId', verifyToken, async (req, res) => { /* ... */ });
 
 export default router;
