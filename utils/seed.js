@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
-import categoryRoutes from'../models/Category';
+import Category from '../models/Category.js';
 
 dotenv.config();
 
