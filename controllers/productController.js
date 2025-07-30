@@ -13,8 +13,9 @@ export const addProduct = async (req, res) => {
 export const getProducts = async (req, res) => {
   try {
     const { mainSection, category, subcategory } = req.query;
-    const filter = { mainSection };
+    const filter = {};
 
+    if (mainSection) filter.mainSection = mainSection;
     if (category) filter.category = category;
     if (subcategory) filter.subcategory = subcategory;
 
