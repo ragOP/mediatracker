@@ -8,7 +8,7 @@ const productSchema = new mongoose.Schema({
   name: String,
   imageUrls: [String],
   price: Number,
-  priority: { type: String, enum: ['high', 'normal', 'low'], default: 'normal' }
+  priority: { type: String, enum: ['high', 'medium', 'low'], default: 'medium' }
 }, { timestamps: true });
 
 const Product = mongoose.model('Product', productSchema);
