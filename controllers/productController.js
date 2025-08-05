@@ -1,12 +1,19 @@
-// controllers/productController.js
 import Product from '../models/Product.js';
 
 export const addProduct = async (req, res) => {
   try {
     const product = await Product.create(req.body);
-    res.json(product);
+    res.status(201).json(product);
   } catch (err) {
-    res.status(400).json({ error: 'Failed to add product' });
+    console.error('Add Product Error:', err);
+
+    if (err.name === 'ValidationError') {
+      // Collect all validation error messages
+      const errors = Object.values(err.errors).map((e) => e.message);
+      return res.status(400).json({ error: 'Validation Error', details: errors });
+    }
+
+    res.status(500).json({ error: err.message || 'Failed to add product' });
   }
 };
 
@@ -22,6 +29,7 @@ export const getProducts = async (req, res) => {
     const products = await Product.find(filter);
     res.json(products);
   } catch (err) {
-    res.status(500).json({ error: 'Failed to fetch products' });
+    console.error('Get Products Error:', err);
+    res.status(500).json({ error: err.message || 'Failed to fetch products' });
   }
 };
