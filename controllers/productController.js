@@ -22,18 +22,34 @@ export const getProducts = async (req, res) => {
     let { mainSection, category, subcategory } = req.query;
     const filter = {};
 
-    if (mainSection) filter.mainSection = decodeURIComponent(mainSection);
+    // Normalize input (remove spaces and lowercase)
+    const normalize = (str) => str.replace(/\s+/g, '').toLowerCase();
+
+    if (mainSection) filter.mainSection = decodeURIComponent(mainSection).toLowerCase();
+
     if (category) {
-      category = decodeURIComponent(category).replace(/20/g, ' ');
-      filter.category = new RegExp(`^${category}$`, 'i'); // case-insensitive exact match
-    }
-    if (subcategory) {
-      subcategory = decodeURIComponent(subcategory).replace(/20/g, ' ');
-      filter.subcategory = new RegExp(`^${subcategory}$`, 'i');
+      category = decodeURIComponent(category);
+      filter.category = new RegExp(`^${normalize(category)}$`, 'i');
     }
 
-    const products = await Product.find(filter);
-    res.json(products);
+    if (subcategory) {
+      subcategory = decodeURIComponent(subcategory);
+      filter.subcategory = new RegExp(`^${normalize(subcategory)}$`, 'i');
+    }
+
+    // Fetch all products and normalize their category for matching
+    const products = await Product.find().lean();
+    const filtered = products.filter((p) => {
+      const cat = p.category ? normalize(p.category) : '';
+      const sub = p.subcategory ? normalize(p.subcategory) : '';
+      return (
+        (!category || cat === normalize(category)) &&
+        (!subcategory || sub === normalize(subcategory)) &&
+        (!mainSection || p.mainSection.toLowerCase() === mainSection)
+      );
+    });
+
+    res.json(filtered);
   } catch (err) {
     console.error('Get Products Error:', err);
     res.status(500).json({ error: err.message || 'Failed to fetch products' });
