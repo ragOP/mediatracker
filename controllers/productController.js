@@ -19,12 +19,18 @@ export const addProduct = async (req, res) => {
 
 export const getProducts = async (req, res) => {
   try {
-    const { mainSection, category, subcategory } = req.query;
+    let { mainSection, category, subcategory } = req.query;
     const filter = {};
 
-    if (mainSection) filter.mainSection = mainSection;
-    if (category) filter.category = category;
-    if (subcategory) filter.subcategory = subcategory;
+    if (mainSection) filter.mainSection = decodeURIComponent(mainSection);
+    if (category) {
+      category = decodeURIComponent(category).replace(/20/g, ' ');
+      filter.category = new RegExp(`^${category}$`, 'i'); // case-insensitive exact match
+    }
+    if (subcategory) {
+      subcategory = decodeURIComponent(subcategory).replace(/20/g, ' ');
+      filter.subcategory = new RegExp(`^${subcategory}$`, 'i');
+    }
 
     const products = await Product.find(filter);
     res.json(products);
